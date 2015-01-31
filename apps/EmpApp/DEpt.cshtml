@@ -1,0 +1,29 @@
+﻿@{
+    var message = "";
+    EmpApp.EmpDbEntities db = new EmpApp.EmpDbEntities();
+    if(IsPost)
+    {
+        var deptName = Request["deptName"];
+        EmpApp.Dept d = new EmpApp.Dept { DeptName = deptName };
+        db.Depts.Add(d);
+        db.SaveChanges();
+        message = "Department added successfully";
+    }
+}
+<form method="post">
+    <p>
+        Dept : <input type="text" name="deptName"/>
+    </p>
+    <input type="submit"/>
+</form>
+<p>@message</p>
+
+<table>
+    @foreach(var d in db.Depts)
+    {
+        <tr>
+            <td>@d.DeptID </td>
+            <td>@d.DeptName</td>
+        </tr>
+    }
+</table>

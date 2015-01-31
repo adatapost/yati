@@ -1,0 +1,38 @@
+﻿@{
+    // 1. declare variable which are used in rest part
+    var roll = 0;
+    var name = "";
+    var birthDate = DateTime.Now;
+    var cmd = "";     //name of submit button
+    var message = ""; //message variable to show message
+
+    // 2. Wrap your code in IsPost block
+
+    if (IsPost)
+    {
+        //Read data from Request
+        cmd = Request["cmd"] ?? "";
+        roll = Request["roll"].AsInt();
+        name = Request["name"] ?? "";
+        birthDate = Request["birthDate"].AsDateTime();
+
+        //Actions - based upon value of submit button
+        if (cmd == "Add")
+        {
+            message = "Add opration";
+        }
+        if (cmd == "Update")
+        {
+            message = "Update operation";
+        }
+    } // End of IsPost
+} // end of main block
+
+<form method="post">
+    Roll : <input type="text" name="roll" />
+    Name : <input type="text" name="name" />
+    Birth Date : <input type="text" name="birthDate" />
+    <input type="submit" name="cmd" value="Add" />
+    <input type="submit" name="cmd" value="Update" />
+</form>
+<p>@message</p>

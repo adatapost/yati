@@ -1,0 +1,52 @@
+﻿@{
+    // Page level variables
+    var roll = 0;
+    var name = "";
+    var birthDate = DateTime.MinValue;
+    var cmd = "";
+    var message = "";
+    StdApp.StudentDbEntities db = new StdApp.StudentDbEntities();
+
+    //POST
+    if (IsPost)
+    {
+        roll = Request["roll"].AsInt();
+        name = Request["name"] ?? "";
+        birthDate = Request["birthDate"].AsDateTime();
+
+        var search = db.Students.Where(x => x.Roll == roll).FirstOrDefault();
+        if (search == null)
+        {
+            StdApp.Student s = new StdApp.Student();
+            s.Roll = roll;
+            s.Name = name;
+            s.BirthDate = birthDate;
+
+            db.Students.Add(s);
+            db.SaveChanges();
+            message = "Record added";
+        }
+        else
+        {
+            message = "Duplicate roll. Reenter please";
+        }
+        
+    }
+
+}
+<form method="post">
+    <p>
+        <label id="roll">Roll</label>
+        <input type="text" name="roll" id="roll" />
+    </p>
+    <p>
+        <label id="name">Name</label>
+        <input type="text" name="name" id="name" />
+    </p>
+    <p>
+        <label id="birthDate">Birth Date</label>
+        <input type="text" name="birthDate" id="birthDate" />
+    </p>
+    <p><input type="submit" name="cmd" value="Add" /></p>
+</form>
+<p>@message</p>

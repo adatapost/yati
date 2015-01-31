@@ -1,0 +1,130 @@
+﻿@{
+    var username = "";
+    var password = "";
+    var email = "";
+    var cmd = "";
+    var message = "";
+    var IsFound = false;
+    StdApp.StudentDbEntities db = new StdApp.StudentDbEntities();
+    
+    if(IsPost)
+    {
+        cmd = Request["cmd"] ?? "";
+        username = Request["username"] ?? "";
+        password = Request["password"] ?? "";
+        email = Request["email"] ?? "";
+    }
+    if (cmd.Equals("Add"))
+    {
+        var search = (from u in db.UserAccounts
+                      where u.Username == username
+                      select u).FirstOrDefault();
+
+        if (search != null)
+        {
+            message = "Username not available. Re-enter new username";
+             
+        }
+        else
+        {
+            db.UserAccounts.Add(new StdApp.UserAccount { 
+             Username = username,
+             Password = password,
+             Email = email
+            });
+            db.SaveChanges();
+            message = "User account added successfully";
+        }
+    }
+    if (cmd.Equals("Update"))
+    {
+        var search = (from u in db.UserAccounts
+                      where u.Username == username
+                      select u).FirstOrDefault();
+
+        if (search == null)
+        {
+            message = "Username not found";
+            email = "";
+        }
+        else
+        {
+            search.Password = password;
+            search.Email = email;
+            db.SaveChanges();
+            message = "User account updated successfully";
+        }
+    }
+    if (cmd.Equals("Delete"))
+    {
+        var search = (from u in db.UserAccounts
+                      where u.Username == username
+                      select u).FirstOrDefault();
+
+        if (search == null)
+        {
+            message = "Username not found";
+            email = "";
+        }
+        else
+        {
+            db.UserAccounts.Remove(search);
+            db.SaveChanges();
+            message = "User account deleted successfully";
+        }
+    }
+    
+    if(cmd.Equals("Search") || cmd.Equals("Edit"))
+    {
+        var search = (from u in db.UserAccounts
+                      where u.Username == username
+                      select u).FirstOrDefault();
+        
+        if(search==null)
+        {
+            message = "Username not found";
+            email = "";
+        }
+        else
+        {
+            username = search.Username;
+            email = search.Email;
+            IsFound = true;
+        }
+    }
+    
+}
+<form method="post">
+    <br/>Username:<input type="text" name="username" value="@username"/>
+         <input type="submit" name="cmd" value="Search"/>
+    <br />Password:<input type="password" name="password" value="@password" />
+    <br />Email:<input type="email" name="email" value="@email" />
+    @if(IsFound)
+    {
+        <input type="submit" name="cmd" value="Update"/>
+        <input type="submit" name="cmd" value="Delete"/>
+        <input type="submit" name="cmd" value="Cancel"/>
+    }
+    else
+    {
+        <input type="submit" name="cmd" value="Add"/>
+    }
+</form>
+<p>@message</p>
+
+<table>
+    @foreach (var u in db.UserAccounts)
+    {
+        <tr>
+            <td>@u.Username</td>
+            <td>@u.Email</td>
+            <td>
+                <form method="post">
+                    <input type="hidden" name="username" value="@u.Username" />
+                    <input type="submit" name="cmd" value="Edit"/>
+                    <input type="submit" name="cmd" value="Delete" />
+                </form>
+            </td>
+        </tr>
+    }
+</table>

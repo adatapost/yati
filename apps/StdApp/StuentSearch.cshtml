@@ -1,0 +1,108 @@
+﻿@{
+    var roll = 0;
+    var name = "";
+    var birthDate = DateTime.MinValue;
+    var cmd = "";
+    var message = "";
+    var isFound = false;
+    StdApp.StudentDbEntities db = new StdApp.StudentDbEntities();
+    
+    if(IsPost)
+    {
+        cmd = Request["cmd"];
+        roll = Request["roll"].AsInt();
+        name = Request["name"] ?? "";
+        birthDate = Request["birthDate"].AsDateTime();
+    }
+    /* Add Student */
+    if(cmd.Equals("Add"))
+    {
+        var search = db.Students.Where(x => x.Roll == roll).FirstOrDefault();
+        if (search == null)
+        {
+            db.Students.Add(new StdApp.Student {
+                 Roll = roll,
+                 Name = name,
+                BirthDate = birthDate
+            });
+            db.SaveChanges();
+            message = "Student record added successfully";
+        }
+        else
+        {
+            message = "Duplicate roll. Reenter data";
+        }
+    }
+    /* Update Student */
+    if (cmd.Equals("Update"))
+    {
+        var search = db.Students.Where(x => x.Roll == roll).FirstOrDefault();
+        if (search != null)
+        {
+            search.Name = name;
+            search.BirthDate = birthDate; 
+            db.SaveChanges();
+            message = "Student record updated successfully";
+        }
+        else
+        {
+            message = "Roll number not found. Reenter data";
+        }
+    }
+    /* Delete Student */
+    if (cmd.Equals("Delete"))
+    {
+        var search = db.Students.Where(x => x.Roll == roll).FirstOrDefault();
+        if (search != null)
+        {
+            db.Students.Remove(search);
+            db.SaveChanges();
+            message = "Student deleted successfully";
+            roll = 0;
+            name = "";
+            birthDate = DateTime.MinValue;
+        }
+        else
+        {
+            message = "Roll number not found. Reenter data";
+        }
+    }
+    /* Search student */
+    if (cmd.Equals("Search"))
+    {
+        
+        var search = db.Students.Where(x => x.Roll == roll).FirstOrDefault();
+        if(search==null)
+        {
+            message = "Roll not found";
+        }
+        else
+        {
+            isFound = true;
+            roll = search.Roll;
+            name = search.Name;
+            birthDate = search.BirthDate ?? DateTime.MinValue;
+        }
+    }
+    
+}
+ 
+<form method="post">
+    Roll:<input type="text" name="roll" value="@roll" />  
+    <input type="submit" name="cmd" value="Search" /> <br/>
+    Name:<input type="text" name="name" value="@name" /> <br/>
+    Birth Date:<input type="text" 
+                      name="birthDate" 
+                      value="@(birthDate==DateTime.MinValue ? "" : birthDate.ToString("dd-MMM-yyyy"))" /> <br/>
+    @if(isFound)
+    {
+        <input type="submit" name="cmd" value="Update" />
+        <input type="submit" name="cmd" value="Delete" />
+        <input type="submit" name="cmd" value="Cancel" />
+    }
+    else
+    {
+         <input type="submit" name="cmd" value="Add"/>
+    }
+</form>
+@message

@@ -1,0 +1,45 @@
+﻿@{
+    StdApp.StudentDbEntities db = new StdApp.StudentDbEntities();
+    var username = "";
+    var password = "";
+    var email = "";
+    var cmd = "";
+    var message = "";
+    
+    if (IsPost)
+    {
+        cmd = Request["cmd"] ?? "";
+    }
+    
+    if(cmd.Equals("Register"))
+    {
+        username = Request["username"] ?? "";
+        password = Request["password"] ?? "";
+        email = Request["email"] ?? "";
+
+        var search = db.UserAccounts.Where(x => x.Username == username).FirstOrDefault();
+        if(search==null)
+        {
+            StdApp.UserAccount acc = new StdApp.UserAccount
+            {
+                 Email = email, Password = password , Username = username
+            };
+          db.UserAccounts.Add(acc);
+          db.SaveChanges();
+          message = "Thank you. Your user account created successfully";
+          username = "";
+          email = ""; 
+        }
+        else
+        {
+            message = "Username you selected is not available. Re-enter please";
+        }
+    }
+}
+<form method="post">
+    Username: <input required type="text" name="username" value="@username" /> <br/>
+    Password: <input required type="password" name="password" /> <br/>
+    Email: <input required type="email" name="email" value="@email" /> <br/>
+    <input type="submit" name="cmd" value="Register" /> <br/>
+</form>
+<p>@message</p>

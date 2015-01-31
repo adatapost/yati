@@ -1,0 +1,39 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>CSS</title>
+    <link href="Css/Style.css" rel="stylesheet" />
+</head>
+<body>
+    <div  id="image1"></div>
+
+    <script>
+        var image1 = document.getElementById("image1");
+        var files = ["high1.jpg", "high2.jpg", "high3.jpg", "high4.jpg"];
+        var index = -1;
+        var totalImages = files.length;
+        image1.style.opacity = 1;
+
+        function showImages() {
+            index++;
+            if (index >= totalImages) {
+                index = 0;
+            }
+            image1.style.backgroundImage = "url(css/" + files[index] + ")";
+            setTimeout(fadeIn, 2000);
+        }
+        function fadeIn() {
+            
+            if (image1.style.opacity >= 0) {
+                image1.style.opacity -= 0.01;
+                setTimeout(fadeIn, 20);
+            } else {
+                image1.style.opacity = 1;
+                showImages();
+                
+            }
+        }
+        showImages();
+    </script>
+</body>
+</html>
